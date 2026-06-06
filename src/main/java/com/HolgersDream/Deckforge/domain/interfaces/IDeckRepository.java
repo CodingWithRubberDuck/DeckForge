@@ -1,5 +1,6 @@
 package com.HolgersDream.Deckforge.domain.interfaces;
 
+import com.HolgersDream.Deckforge.domain.Card;
 import com.HolgersDream.Deckforge.domain.Deck;
 import com.HolgersDream.Deckforge.domain.DeckCard;
 
@@ -11,7 +12,8 @@ public interface IDeckRepository {
     void addDeckToUser(Deck newDeck);
     Optional<Deck> findDeckById(int deckId);
     List<DeckCard> findDeckCards(int deckId);
-    void addCardToDeck(int cardId, int deckId, boolean isCommander);
+    //Har nu et Deck og Card som parameter/argumenter i stedet for bare deres id.
+    void addCardToDeck(Deck deck, Card card, boolean isCommander);
     Optional<DeckCard> findDeckCardById(int deckContainId);
     void deleteCardFromDeck(int deckContainId);
 }

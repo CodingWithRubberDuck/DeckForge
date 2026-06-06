@@ -96,7 +96,7 @@ public class EventService {
         } else {
             specificEvent = eventResult.get();
         }
-        specificEvent.getParticipants().addAll(repository.findEventParticipants(eventId));
+        specificEvent.addAllParticipants(repository.findEventParticipants(eventId));
         return specificEvent;
     }
 

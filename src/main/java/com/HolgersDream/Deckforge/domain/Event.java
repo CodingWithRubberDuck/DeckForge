@@ -60,8 +60,10 @@ public class Event {
         }
         this.startTime = startTime;
 
-        if (date == null || date.isBefore(LocalDate.now())){
-            throw new IllegalArgumentException("Et event skal have en start dato i fremtiden eller nutiden");
+        // Har fjernet "date.isBefore(LocalDate.now())",
+        // da der så ikke kunne være fortidige events i systemet
+        if (date == null){
+            throw new IllegalArgumentException("Et event skal have en start dato");
         }
         this.date = date;
 
@@ -103,5 +105,12 @@ public class Event {
 
     public List<User> getParticipants(){
         return participants;
+    }
+
+
+    // Tilføjet en metode til at tilføje listen af "User" til Event
+    /// Others
+    public void addAllParticipants(List<User> newParticipants){
+        this.participants.addAll(newParticipants);
     }
 }

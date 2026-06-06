@@ -22,6 +22,7 @@ public class CollectionController {
 
 
     @GetMapping("/collection/search")
+    //@RequestParam(required = false) betyder at den ikke SKAL bruge name, det er kun til at søge
     public String showAndSearchCollection(@RequestParam(required = false) String name, HttpSession session, Model model) {
         AuthSessionUser currentUser = sessionObjectRetriever.getSessionUser(session);
         if (currentUser == null) {

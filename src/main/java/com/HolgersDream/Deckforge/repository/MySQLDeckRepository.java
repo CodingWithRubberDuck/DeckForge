@@ -133,8 +133,9 @@ public class MySQLDeckRepository implements IDeckRepository {
         }
     }
 
+    // Har ligeledes ændret til at passe til ændringer i interfacet
     @Override
-    public void addCardToDeck(int cardId, int deckId, boolean isCommander) {
+    public void addCardToDeck(Deck deck, Card card, boolean isCommander) {
         String sql = """
                 INSERT INTO deck_contain_card (deck_id, card_id, is_commander)
                 VALUES (?, ?, ?);
@@ -142,8 +143,8 @@ public class MySQLDeckRepository implements IDeckRepository {
         try (Connection con = databaseConfig.getConnection();
              PreparedStatement stmt = con.prepareStatement(sql)) {
 
-            stmt.setInt(1, deckId);
-            stmt.setInt(2, cardId);
+            stmt.setInt(1, deck.getDeckId());
+            stmt.setInt(2, card.getCardId());
             stmt.setBoolean(3, isCommander);
 
             stmt.executeUpdate();

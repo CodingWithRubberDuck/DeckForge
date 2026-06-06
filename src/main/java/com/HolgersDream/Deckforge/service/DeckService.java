@@ -56,7 +56,7 @@ public class DeckService {
         if (card.isPresent()) {
             return card.get();
         }
-        throw new DeckCardAddException("Kortet til deck blev ikke fundet");
+        throw new AddNonexistentDeckCardException("Kortet til deck blev ikke fundet");
     }
 
     public List<Card> getAllCardsForDeck(){
@@ -80,19 +80,19 @@ public class DeckService {
         }
         //Tjekker om der er max kort i deck
         checkMaxCards(specificDeck);
-        deckRepository.addCardToDeck(cardId, deckId, true);
+        deckRepository.addCardToDeck(specificDeck, newCard, true);
         return newCard;
     }
 
     public Card checkAddGenericToDeck(int deckId, int userId, int cardId){
-        //Henter det tilhørende deck (og kun deck da kort ikke er nødvendige) (f.eks på grund af format)
+        //Henter det tilhørende deck (f.eks på grund af format) (og kun deck da kort ikke er nødvendige)
         Deck specificDeck = handleGetOnlyDeck(deckId);
         //Tjekker at brugeren har tilladelse til at ændre/se deck
         checkDeckAccess(specificDeck, userId);
         //Henter det nye kort
         Card newCard = getCardForDeck(cardId);
         checkMaxCards(specificDeck);
-        deckRepository.addCardToDeck(cardId, deckId, false);
+        deckRepository.addCardToDeck(specificDeck, newCard, false);
         return newCard;
     }
 
@@ -111,6 +111,11 @@ public class DeckService {
         //Tjekker om deck-kortet eksisterer
         DeckCard deckCardForRemoval = getDeckCard(deckContainId, deckId);
         //Tjekker om deck-kortet er i listen
+
+        // Efter flere test har vi imidlertid ikke fundet scenarier hvor "DeckcardRemoveException" kastes,
+        // da den ellers dækkes ind af andre tjek.
+        // Teoretisk kunne der være en edge-case, hvor anden data ikke længere er gyldig
+        // og kunne redes af dette tjek, men yderst usandsynligt.
         if (!checkDeckCardExistsInList(specificDeck.getCards(), deckContainId)){
             throw new DeckCardRemoveException("Kortet der ville slettes blev ikke fundet");
         }
@@ -133,13 +138,14 @@ public class DeckService {
                 return false;
             }
         }
+
         return true;
     }
 
     private DeckCard handleGetSpecificDeckCard(int deckContainId){
         Optional<DeckCard> deckCardResult = deckRepository.findDeckCardById(deckContainId);
         if (deckCardResult.isEmpty()){
-            throw new NoDeckFoundException("Der kunne ikke findes detaljer om dette kort i deck");
+            throw new DeckCardNotFoundException("Der kunne ikke findes detaljer om dette kort i deck");
         } else {
             return deckCardResult.get();
         }
@@ -148,7 +154,7 @@ public class DeckService {
 
     private Deck handleGetSpecificDeck(int deckId){
         Deck specificDeck = handleGetOnlyDeck(deckId);
-        specificDeck.getCards().addAll(deckRepository.findDeckCards(deckId));
+        specificDeck.addAllCards(deckRepository.findDeckCards(deckId));
         return specificDeck;
     }
 

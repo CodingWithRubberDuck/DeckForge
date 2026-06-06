@@ -63,9 +63,15 @@ public class GlobalExceptionHandler {
         return "redirect:/deck/personal-decks";
     }
 
-    @ExceptionHandler(DeckCardAddException.class)
-    public String handleNoDeckCardFound(DeckCardAddException ndcfe, RedirectAttributes redirectAttributes){
-        redirectAttributes.addFlashAttribute("responseMessage", ndcfe.getMessage());
+    @ExceptionHandler(AddNonexistentDeckCardException.class)
+    public String handleAddNonexistentDeckCard(AddNonexistentDeckCardException andce, RedirectAttributes redirectAttributes){
+        redirectAttributes.addFlashAttribute("responseMessage", andce.getMessage());
+        return "redirect:/deck/personal-decks";
+    }
+
+    @ExceptionHandler(DeckCardNotFoundException.class)
+    public String handleRemoveNonexistentDeckCard(DeckCardNotFoundException dcnfe, RedirectAttributes redirectAttributes){
+        redirectAttributes.addFlashAttribute("responseMessage", dcnfe.getMessage());
         return "redirect:/deck/personal-decks";
     }
 

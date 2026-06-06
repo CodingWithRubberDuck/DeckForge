@@ -66,4 +66,11 @@ public class Deck {
     public List<DeckCard> getCards() {
         return cards;
     }
+
+    // Tilføjet en specifik metode til at tilføje kort til et deck
+    /// Others
+    public void addAllCards(List<DeckCard> newCards){
+        this.cards.addAll(newCards);
+    }
+
 }
