@@ -27,6 +27,7 @@ public class MySQLDeckRepository implements IDeckRepository {
 
     @Override
     public List<Deck> findDecksById(int userId) {
+        // Left join for at tælle kort selvom der er 0 kort til et deck, (vil stadig have et felt med 0)
         String sql = """
                 SELECT d.deck_id, d.user_id, d.deck_name, d.format, count(dcc.card_id) as card_amount
                 from deck d
@@ -77,6 +78,7 @@ public class MySQLDeckRepository implements IDeckRepository {
 
     @Override
     public Optional<Deck> findDeckById(int deckId) {
+        // Left join for at tælle kort selvom der er 0 kort til et deck, (vil stadig have et felt med 0)
         String sql = """
                 SELECT d.deck_id, d.user_id, d.deck_name, d.format, count(dcc.card_id) as card_amount
                 from deck d
@@ -103,6 +105,8 @@ public class MySQLDeckRepository implements IDeckRepository {
 
     @Override
     public List<DeckCard> findDeckCards(int deckId) {
+        // tabellen deck_contain_card har et INNER JOIN med henholdsvis card_list med referencer til kort,
+        // og deck som kortene tilhører
         String sql = """
                 SELECT dcc.deck_id, dcc.deck_contain_id, dcc.is_commander, cl.*
                 FROM deck_contain_card dcc
@@ -156,6 +160,8 @@ public class MySQLDeckRepository implements IDeckRepository {
 
     @Override
     public Optional<DeckCard> findDeckCardById(int deckContainId) {
+        // tabellen deck_contain_card har et INNER JOIN med henholdsvis card_list med referencer til kort,
+        // og deck som kortene tilhører
         String sql = """
                 SELECT dcc.deck_id, dcc.deck_contain_id, dcc.is_commander, cl.*
                 FROM deck_contain_card dcc

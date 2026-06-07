@@ -77,6 +77,8 @@ public class AuthUserController {
     @GetMapping("/return")
     public String returnBack(HttpSession session) {
         AuthSessionUser currentUser = sessionObjectRetriever.getSessionUser(session);
+        // Returnere enten til index siden eller velkomst-siden,
+        // baseret på om brugeren er logget ind
         if (currentUser == null) {
             return "redirect:/";
         } else {

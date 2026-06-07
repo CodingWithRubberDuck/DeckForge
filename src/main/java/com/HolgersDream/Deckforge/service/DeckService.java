@@ -30,6 +30,8 @@ public class DeckService {
 
     public void checkAddDeck(DeckRequest deckRequest){
         Deck newDeck;
+
+        //Tjek af domæneregler
         try {
             newDeck = new Deck(0, deckRequest.getUserId(), 0, deckRequest.getDeckName(), deckRequest.getFormat());
         } catch (IllegalArgumentException iae){
@@ -40,12 +42,14 @@ public class DeckService {
 
 
     public Deck getPersonalDeckAndCards(int deckId, int userId){
+        //Kalder interne hjælpemetoder
         Deck personalDeck = handleGetSpecificDeck(deckId);
         checkDeckAccess(personalDeck, userId);
         return personalDeck;
     }
 
     public Deck getOnlyPersonalDeck(int deckId, int userId){
+        //Kalder interne hjælpemetoder
         Deck personalOnlyDeck = handleGetOnlyDeck(deckId);
         checkDeckAccess(personalOnlyDeck, userId);
         return personalOnlyDeck;
@@ -91,6 +95,7 @@ public class DeckService {
         checkDeckAccess(specificDeck, userId);
         //Henter det nye kort
         Card newCard = getCardForDeck(cardId);
+        //Tjekker i forhold til max kort
         checkMaxCards(specificDeck);
         deckRepository.addCardToDeck(specificDeck, newCard, false);
         return newCard;
@@ -98,6 +103,7 @@ public class DeckService {
 
 
     public DeckCard getDeckCard(int deckContainId, int deckId){
+        //Kalder interne hjælpemetoder
         DeckCard deckCard = handleGetSpecificDeckCard(deckContainId);
         checkDeckCardAccess(deckCard, deckId);
         return deckCard;
@@ -114,7 +120,7 @@ public class DeckService {
 
         // Efter flere test har vi imidlertid ikke fundet scenarier hvor "DeckcardRemoveException" kastes,
         // da den ellers dækkes ind af andre tjek.
-        // Teoretisk kunne der være en edge-case, hvor anden data ikke længere er gyldig
+        // Teoretisk kunne der potentielt være en edge-case, hvor anden data ikke længere er gyldig
         // og kunne redes af dette tjek, men yderst usandsynligt.
         if (!checkDeckCardExistsInList(specificDeck.getCards(), deckContainId)){
             throw new DeckCardRemoveException("Kortet der ville slettes blev ikke fundet");
@@ -138,7 +144,6 @@ public class DeckService {
                 return false;
             }
         }
-
         return true;
     }
 
@@ -151,13 +156,14 @@ public class DeckService {
         }
     }
 
-
+    //Hjælpemetode til at få fat på et specifikt deck og tilhørende kort
     private Deck handleGetSpecificDeck(int deckId){
         Deck specificDeck = handleGetOnlyDeck(deckId);
         specificDeck.addAllCards(deckRepository.findDeckCards(deckId));
         return specificDeck;
     }
 
+    //Hjælpemetode til kun at få fat på et specifikt deck
     private Deck handleGetOnlyDeck(int deckId){
         Optional<Deck> deckResult = deckRepository.findDeckById(deckId);
         if (deckResult.isEmpty()){
@@ -188,6 +194,7 @@ public class DeckService {
         return false;
     }
 
+    //Hjælpemetode til tjek af max kort
     private void checkMaxCards(Deck testDeck){
         final int COMMANDER_MAX_CARDS = 100;
         final int ABSOLUTE_MAX_CARDS = 2000;

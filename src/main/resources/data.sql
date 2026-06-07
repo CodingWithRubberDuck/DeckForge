@@ -66,7 +66,7 @@ VALUES (1, 1, 1, 'Sigurd, Jarl of Ravensthorpe', 'LEGENDARY', 'CREATURE', 'Human
 
 --Password 1234frank
 INSERT INTO user (name, email, password_hash, role)
-VALUES ('Frank', 'Frank@gmail.com', '$2a$10$VxHaDOtbRR9P5aWhz1Nv.eVAB5gETUHv7K82SNYXnq4JOw7F8z72q', 'ADMIN');
+VALUES ('Castle', 'Frank@gmail.com', '$2a$10$VxHaDOtbRR9P5aWhz1Nv.eVAB5gETUHv7K82SNYXnq4JOw7F8z72q', 'ADMIN');
 
 --Password magicman1
 INSERT INTO user (name, email, password_hash)

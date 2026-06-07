@@ -57,6 +57,11 @@ public class MySQLEventRepository implements IEventRepository {
 
     @Override
     public List<Event> findRegisteredEvents(int userId) {
+        // Tabellen event har først et INNER JOIN med user_participate_event,
+        // hvor der filtreres fra de events som brugeren (userId) ikke deltager i.
+        // Baseret på resultatet af det første join, bliver der gjort et LEFT JOIN,
+        // igen med user_participate_event, hvor der nu tælles tilmeldte og udregnes ledige pladser.
+        // WHERE sorterer fra de events som er i fortiden.
         String sql = """
                 SELECT
                 e.event_id, e.owner_id, e.event_name, e.max_slots, e.location, e.start_time,
@@ -119,6 +124,7 @@ public class MySQLEventRepository implements IEventRepository {
 
     @Override
     public Optional<Event> findEventById(int eventId) {
+        // Skal bruge LEFT JOIN for at tælle deltagere for events som har 0 deltagere
         String sql = """
                 SELECT e.event_id, e.owner_id, e.event_name, e.max_slots, e.location, e.start_time, e.date, max_slots - count(upe.user_id) as available_slots
                 FROM event e

@@ -34,10 +34,13 @@ public class EventService {
     }
 
     public void checkAddEvent(EventRequest eventRequest, AuthSessionUser sessionUser){
+        //Tjek/validering af tilladelse ved rolle
         Role role = sessionUser.getRole();
         if (role != Role.ORGANIZER && role != Role.ADMIN) {
             throw new NotAuthorizedException("Du har ikke tilladelse til at udføre denne handling");
         }
+
+        // Tjek af domæneregler og et simpelt tjek om eventet oprettes til fortiden.
         Event newEvent;
         try {
             newEvent = new Event(0, sessionUser.getUserId(), eventRequest.getEventName(), eventRequest.getMaxSlots(), eventRequest.getMaxSlots(), eventRequest.getLocation(), eventRequest.getStartTime(), eventRequest.getDate());
@@ -56,12 +59,14 @@ public class EventService {
 
     public Event checkJoinEvent(int userId, int eventId){
         Event retrievedEvent = handleGetSpecificEvent(eventId);
+        //To tjek i forhold til om der er ledige pladser og om de allerede er tilmeldt.
         if (retrievedEvent.getAvailableSlots() <= 0){
             throw new ParticipateEventException("Der er desværre ikke ledige pladser tilbage til eventet " + retrievedEvent.getEventName());
         }
         if (checkAlreadyParticipant(userId, retrievedEvent.getParticipants())){
             throw new ParticipateEventException("Du er allerede tilmeldt eventet " + retrievedEvent.getEventName());
         }
+        //Kald af en hjælpemetode til at tjekke eventet ikke allerede er holdt.
         checkDateOfEvent(retrievedEvent);
         repository.addUserToEvent(userId, eventId);
         return retrievedEvent;
@@ -70,9 +75,11 @@ public class EventService {
 
     public Event checkLeaveEvent(int userId, int eventId){
         Event retrievedEvent = handleGetSpecificEvent(eventId);
+        //Et tjek af om de faktisk er tilmeldt dette event
         if (!checkAlreadyParticipant(userId, retrievedEvent.getParticipants())){
             throw new ParticipateEventException("Du er ikke tilmeldt eventet " + retrievedEvent.getEventName() + " og kan derfor ikke afmelde dig");
         }
+        //Kald af en hjælpemetode til at tjekke eventet ikke allerede er holdt.
         checkDateOfEvent(retrievedEvent);
         repository.removeUserFromEvent(userId, eventId);
         return retrievedEvent;
@@ -88,6 +95,8 @@ public class EventService {
         return false;
     }
 
+    //En hjælpemetode til at finde et specifikt event og tjekke om det eksisterer,
+    // samt at få fat på deltagerne
     private Event handleGetSpecificEvent(int eventId){
         Event specificEvent;
         Optional<Event> eventResult = repository.findEventById(eventId);
@@ -100,6 +109,7 @@ public class EventService {
         return specificEvent;
     }
 
+    //Meget simpel hjælpemetode til tjek af om et events dato er i fortiden.
     private void checkDateOfEvent(Event event){
         if (event.getDate().isBefore(LocalDate.now())){
             throw new ParticipateEventException("Eventet du tilgår er allerede forbi");

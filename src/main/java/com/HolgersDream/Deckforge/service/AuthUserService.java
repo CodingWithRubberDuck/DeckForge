@@ -24,12 +24,14 @@ public class AuthUserService {
     public void checkRegister(AuthRequest authRequest, String repeated){
         User user;
         try {
-            //Indsætter bare placeholder id = 0, da det ikke vil blive brugt alligevel, og null på dateAskedForDelete, da det ikke er sket
+            //Indsætter bare placeholder id = 0, da det ikke vil blive brugt alligevel,
+            // og null på dateAskedForDelete, da det ikke er sket
             user = new User(0, authRequest.getName(), authRequest.getEmail(), authRequest.getPassword(), Role.USER);
         } catch (IllegalArgumentException iae){
             throw new RegisterValidationException(iae.getMessage());
         }
 
+        //Forretningsvalidering af den nye bruger.
         registerValidation.validate(user, repeated);
         if (repository.findByEmail(user.getEmail()).isPresent()){
             throw new RegisterValidationException("Den indtastede email er allerede i brug");
@@ -41,6 +43,8 @@ public class AuthUserService {
 
     public AuthSessionUser checkLogin(AuthRequest authRequest){
         User user = repository.findByEmail(authRequest.getEmail()).orElse(null);
+
+        // Tjekker om email ikke kunne findes og om kodeordet passer overens.
         if (user != null && BCrypt.checkpw(authRequest.getPassword(), user.getPassword())){
             repository.updateLastLogin(user.getUserId());
             return new AuthSessionUser(user.getUserId(), user.getName(), user.getEmail(), user.getRole());

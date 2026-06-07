@@ -21,11 +21,14 @@ public class FileExceptionLoggerRepository implements IExceptionLoggerRepository
     @Override
     public void saveExceptionMessage(Exception e, String details){
         setFilePath();
+        // Prøver at oprette eller skrive til en fil i logs mappen.
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath, true))){
             writer.write("\n" + LocalTime.now().format(timeFmt) + " : " + e.getMessage()
             + "\n " + details);
         } catch (IOException ioe) {
             setBackupFilePath();
+            // I tilfælde af fejl ved første lokation.
+            // Prøver at skrive til et lokalt sted på devicen, samt dokumenterer fejlen, der skete ovenover.
             try (BufferedWriter writer = new BufferedWriter(new FileWriter(backupFilePath, true))){
                 writer.write("\n" + LocalTime.now().format(timeFmt) + " : " + e.getMessage() +
                         "\n " + details +
@@ -41,6 +44,7 @@ public class FileExceptionLoggerRepository implements IExceptionLoggerRepository
     }
 
     private void setBackupFilePath(){
+        // finder stien til den lokale bruger-mappe home-directory
         this.backupFilePath = Paths.get(System.getProperty("user.home")) + "\\" + getLogName();
     }
 
